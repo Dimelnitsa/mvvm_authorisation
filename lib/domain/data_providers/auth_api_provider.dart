@@ -3,8 +3,7 @@
 class AuthApiProvider{
 
   Future<String> logIn(String login, String password)async{
-    await Future.delayed(const Duration(seconds: 2));
-    final isSuccess = login == 'admin' && password == '12345678';
+    final isSuccess = login == 'admin' && password == '1234';
     if (isSuccess) {return 'sdffaldsfsdaflkjlw';}
         else { throw AuthApiProviderIncorrectLoginDataError();}
   }

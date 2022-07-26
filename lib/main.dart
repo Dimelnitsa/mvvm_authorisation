@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_authorisation/ui_screens/auth_screen/auth_screen.dart';
-import 'package:provider/provider.dart';
+import 'package:mvvm_authorisation/ui_screens/loader_widget.dart';
+import 'package:mvvm_authorisation/ui_screens/main_screen.dart';
 
 void main() {
-  runApp(MyApp.create());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -17,17 +18,25 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: AuthScreen.create(),
-    );
-  }
-
-  static Widget create() {
-    return Provider(
-      create: (_) => _ViewModel(),
-      lazy: false,
-      child: const MyApp(),
+      routes: {
+       // 'auth': (_) => AuthScreen.create(),
+        //'main': (_) => MainScreen.create(),
+        'loader': (_) => LoaderWidget.create(),
+      },
+      onGenerateRoute: (RouteSettings settings) {
+        if (settings.name == 'auth') {
+          return PageRouteBuilder<dynamic>(
+              pageBuilder: (context, animation1, animation2) =>
+                  AuthScreen.create(),
+              transitionDuration: Duration.zero);
+        } else if (settings.name == 'main') {
+          return PageRouteBuilder<dynamic>(
+              pageBuilder: (context, animation1, animation2) =>
+                  MainScreen.create(),
+              transitionDuration: Duration.zero);
+        }
+      },
+      home: LoaderWidget.create(),
     );
   }
 }
-
-class _ViewModel {}

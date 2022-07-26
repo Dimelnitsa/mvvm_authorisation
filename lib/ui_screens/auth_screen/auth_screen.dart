@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm_authorisation/domain/data_providers/auth_api_provider.dart';
 import 'package:mvvm_authorisation/domain/services/auth_service.dart';
+import 'package:mvvm_authorisation/ui_screens/navigation/main_navigation.dart';
 import 'package:provider/provider.dart';
 
 enum _ViewModelAuthButtonState { canSubmit, authProcess, disable }
@@ -42,7 +43,7 @@ class _ViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> onAuthButtonPressed() async {
+  Future<void> onAuthButtonPressed(BuildContext context) async {
 
     final login = _state.login;
     final password = _state.password;
@@ -58,6 +59,8 @@ class _ViewModel extends ChangeNotifier {
       await _authService.logIn(login, password);
       _state.isAuthInProcess =  false;
       notifyListeners();
+      MainNavigation.showLoader(context);
+
     } on AuthApiProviderIncorrectLoginDataError {
       _state.authErrorTitle ='неверный логин';
       _state.isAuthInProcess = false;
@@ -164,13 +167,14 @@ class _ButtonSubmit extends StatelessWidget {
     final authButtonState =
         context.select((_ViewModel vm) => vm.state.authButtonState);
     final model = context.read<_ViewModel>();
+    final onPressed = authButtonState == _ViewModelAuthButtonState.canSubmit
+        ? model.onAuthButtonPressed
+        : null;
     final childButton = authButtonState == _ViewModelAuthButtonState.authProcess
         ? const CircularProgressIndicator()
         : const Text('Submit');
     return ElevatedButton(
-      onPressed: authButtonState == _ViewModelAuthButtonState.canSubmit
-          ? model.onAuthButtonPressed
-          : null,
+      onPressed: ()=> onPressed?.call(context),
       child: childButton,
     );
   }
